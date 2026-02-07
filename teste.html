@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação Técnica - Estágio TI</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
+        #quiz-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        .timer { font-weight: bold; color: #e74c3c; font-size: 1.2em; margin-bottom: 20px; }
+        .question { font-size: 1.1em; margin-bottom: 20px; font-weight: bold; }
+        .options button { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; text-align: left; background: #fff; transition: 0.2s; }
+        .options button:hover { background: #f0f0f0; }
+        .hidden { display: none; }
+        #results { line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="timer-display" class="timer">Tempo restante: 60s</div>
+    <div id="question-content">
+        <div id="question-text" class="question"></div>
+        <div id="options-container" class="options"></div>
+    </div>
+    <div id="results" class="hidden">
+        <h2>Resultado da Avaliação</h2>
+        <div id="score-summary"></div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "(HTML) Qual tag é a mais adequada para definir o cabeçalho principal de uma página?", o: ["<header>", "<head>", "<h1>", "<title>"], a: 2 },
+        { q: "(HTML) Para que serve o atributo 'alt' em uma tag <img>?", o: ["Mudar altura", "Texto alternativo/acessibilidade", "Criar link", "Legenda"], a: 1 },
+        { q: "(HTML) Qual elemento cria uma lista onde a ordem NÃO importa?", o: ["<ol>", "<li>", "<ul>", "<list>"], a: 2 },
+        { q: "(HTML) Qual atributo abre um link em uma nova aba?", o: ["target='_blank'", "rel='external'", "href='new'", "mode='tab'"], a: 0 },
+        { q: "(HTML) Onde devem ser colocadas as tags <meta>?", o: ["Final do body", "Dentro do head", "Antes do html", "Dentro de uma div"], a: 1 },
+        { q: "(CSS) O que cria espaço ENTRE o conteúdo e a borda?", o: ["margin", "padding", "spacing", "border-width"], a: 1 },
+        { q: "(CSS) Como selecionamos todos os <p> dentro de uma <div>?", o: ["div + p", "div .p", "div p", "div(p)"], a: 2 },
+        { q: "(CSS) Qual propriedade altera a cor do texto?", o: ["text-color", "background-color", "font-style", "color"], a: 3 },
+        { q: "(CSS) Qual display permite alinhar itens com flexibilidade?", o: ["block", "inline", "flex", "static"], a: 2 },
+        { q: "(CSS) Qual unidade é relativa ao elemento raiz (html)?", o: ["px", "em", "rem", "%"], a: 2 },
+        { q: "(Lógica) Se x=10 e x=x+5, qual o valor de x?", o: ["5", "10", "15", "20"], a: 2 },
+        { q: "(Lógica) Estrutura que repete enquanto a condição for verdadeira?", o: ["if", "switch", "while", "array"], a: 2 },
+        { q: "(Lógica) Acessar posição 5 de um array com 3 elementos gera:", o: ["Retorna o primeiro", "Erro/Undefined", "Aumenta o array", "Apaga o array"], a: 1 },
+        { q: "(Lógica) Valor de: (5 > 2) E (10 < 5)?", o: ["Verdadeiro", "Falso", "Null", "Erro"], a: 1 },
+        { q: "(Lógica) O que faz o operador '%'?", o: ["Porcentagem", "Divisão decimal", "Resto da divisão", "Potência"], a: 2 },
+        { q: "(Mat) Resultado de: 15 + 5 * 2?", o: ["40", "25", "30", "20"], a: 1 },
+        { q: "(Mat) Como o número 2 é em binário?", o: ["01", "11", "10", "00"], a: 2 },
+        { q: "(Mat) Resultado de: NÃO(FALSO OU VERDADEIRO)?", o: ["Verdadeiro", "Falso", "Indeterminado", "Nulo"], a: 1 },
+        { q: "(Mat) O que é crescimento exponencial?", o: ["Constante", "Cada vez mais rápido", "Cresce e diminui", "Nunca passa de zero"], a: 1 },
+        { q: "(Mat) Quantos bits há em 1 Byte?", o: ["4", "10", "8", "1024"], a: 2 },
+        { q: "(Decisão) Terminou a tarefa antes do prazo. O que fazer?", o: ["Ficar em silêncio", "Avisar supervisor/procurar ajuda", "Mexer no código alheio", "Sair mais cedo"], a: 1 },
+        { q: "(Decisão) Encontrou um bug que não sabe resolver:", o: ["Apagar código", "Pesquisar e depois pedir ajuda", "Interromper supervisor na hora", "Chutar soluções"], a: 1 },
+        { q: "(Decisão) Cliente pediu mudança direta sem o supervisor saber:", o: ["Fazer na hora", "Informar e repassar ao supervisor", "Ignorar", "Dizer que não sabe"], a: 1 },
+        { q: "(Decisão) Não vai conseguir entregar no prazo:", o: ["Esperar vencer", "Avisar o quanto antes", "Trabalhar 24h sem avisar", "Culpar a internet"], a: 1 },
+        { q: "(Decisão) Enviou senha pessoal para o GitHub por engano:", o: ["Deixar lá", "Avisar e trocar senha na hora", "Apagar localmente", "Trocar de nome"], a: 1 }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let timer;
+
+    function startTimer() {
+        timeLeft = 60;
+        document.getElementById('timer-display').innerText = `Tempo restante: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-display').innerText = `Tempo restante: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function showQuestion() {
+        if (currentQuestion >= questions.length) {
+            showResults();
+            return;
+        }
+        clearInterval(timer);
+        startTimer();
+        const q = questions[currentQuestion];
+        document.getElementById('question-text').innerText = `${currentQuestion + 1}. ${q.q}`;
+        const optionsDiv = document.getElementById('options-container');
+        optionsDiv.innerHTML = '';
+        q.o.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => { score += (index === q.a ? 1 : 0); nextQuestion(); };
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        showQuestion();
+    }
+
+    function showResults() {
+        clearInterval(timer);
+        document.getElementById('question-content').classList.add('hidden');
+        document.getElementById('timer-display').classList.add('hidden');
+        document.getElementById('results').classList.remove('hidden');
+        document.getElementById('score-summary').innerHTML = `
+            <p>O candidato acertou <strong>${score}</strong> de <strong>${questions.length}</strong> questões.</p>
+            <p>Aproveitamento: ${(score/questions.length*100).toFixed(1)}%</p>
+        `;
+    }
+
+    showQuestion();
+</script>
+</body>
+</html>
