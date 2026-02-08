@@ -5,57 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaliação Técnica - Estágio TI</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; display: flex; justify-content: center; padding: 20px; }
-        #quiz-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        .timer { font-weight: bold; color: #e74c3c; font-size: 1.2em; margin-bottom: 20px; }
-        .question { font-size: 1.1em; margin-bottom: 20px; font-weight: bold; }
-        .options button { display: block; width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; text-align: left; background: #fff; transition: 0.2s; }
-        .options button:hover { background: #f0f0f0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        #quiz-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        .timer { font-weight: bold; color: #d9534f; font-size: 1.2em; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .question { font-size: 1.2em; margin-bottom: 20px; color: #333; line-height: 1.4; }
+        .options button { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; text-align: left; background: #fff; transition: all 0.2s; font-size: 1em; }
+        .options button:hover { background: #e9ecef; border-color: #bbb; }
         .hidden { display: none; }
-        #results { line-height: 1.6; }
+        #results { text-align: center; line-height: 1.8; }
+        .progress { font-size: 0.9em; color: #666; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div id="quiz-container">
+    <div class="progress" id="progress-display">Pergunta 1 de 30</div>
     <div id="timer-display" class="timer">Tempo restante: 60s</div>
+    
     <div id="question-content">
         <div id="question-text" class="question"></div>
         <div id="options-container" class="options"></div>
     </div>
+
     <div id="results" class="hidden">
-        <h2>Resultado da Avaliação</h2>
-        <div id="score-summary"></div>
+        <h2>Avaliação Finalizada</h2>
+        <div id="score-summary" style="font-size: 1.3em;"></div>
+        <p style="margin-top: 20px; color: #666;">Tire um print desta tela e envie para o seu gestor.</p>
     </div>
 </div>
 
 <script>
     const questions = [
-        { q: "(HTML) Qual tag é a mais adequada para definir o cabeçalho principal de uma página?", o: ["<header>", "<head>", "<h1>", "<title>"], a: 2 },
-        { q: "(HTML) Para que serve o atributo 'alt' em uma tag <img>?", o: ["Mudar altura", "Texto alternativo/acessibilidade", "Criar link", "Legenda"], a: 1 },
-        { q: "(HTML) Qual elemento cria uma lista onde a ordem NÃO importa?", o: ["<ol>", "<li>", "<ul>", "<list>"], a: 2 },
-        { q: "(HTML) Qual atributo abre um link em uma nova aba?", o: ["target='_blank'", "rel='external'", "href='new'", "mode='tab'"], a: 0 },
-        { q: "(HTML) Onde devem ser colocadas as tags <meta>?", o: ["Final do body", "Dentro do head", "Antes do html", "Dentro de uma div"], a: 1 },
-        { q: "(CSS) O que cria espaço ENTRE o conteúdo e a borda?", o: ["margin", "padding", "spacing", "border-width"], a: 1 },
-        { q: "(CSS) Como selecionamos todos os <p> dentro de uma <div>?", o: ["div + p", "div .p", "div p", "div(p)"], a: 2 },
-        { q: "(CSS) Qual propriedade altera a cor do texto?", o: ["text-color", "background-color", "font-style", "color"], a: 3 },
-        { q: "(CSS) Qual display permite alinhar itens com flexibilidade?", o: ["block", "inline", "flex", "static"], a: 2 },
-        { q: "(CSS) Qual unidade é relativa ao elemento raiz (html)?", o: ["px", "em", "rem", "%"], a: 2 },
-        { q: "(Lógica) Se x=10 e x=x+5, qual o valor de x?", o: ["5", "10", "15", "20"], a: 2 },
-        { q: "(Lógica) Estrutura que repete enquanto a condição for verdadeira?", o: ["if", "switch", "while", "array"], a: 2 },
-        { q: "(Lógica) Acessar posição 5 de um array com 3 elementos gera:", o: ["Retorna o primeiro", "Erro/Undefined", "Aumenta o array", "Apaga o array"], a: 1 },
-        { q: "(Lógica) Valor de: (5 > 2) E (10 < 5)?", o: ["Verdadeiro", "Falso", "Null", "Erro"], a: 1 },
-        { q: "(Lógica) O que faz o operador '%'?", o: ["Porcentagem", "Divisão decimal", "Resto da divisão", "Potência"], a: 2 },
-        { q: "(Mat) Resultado de: 15 + 5 * 2?", o: ["40", "25", "30", "20"], a: 1 },
-        { q: "(Mat) Como o número 2 é em binário?", o: ["01", "11", "10", "00"], a: 2 },
-        { q: "(Mat) Resultado de: NÃO(FALSO OU VERDADEIRO)?", o: ["Verdadeiro", "Falso", "Indeterminado", "Nulo"], a: 1 },
-        { q: "(Mat) O que é crescimento exponencial?", o: ["Constante", "Cada vez mais rápido", "Cresce e diminui", "Nunca passa de zero"], a: 1 },
-        { q: "(Mat) Quantos bits há em 1 Byte?", o: ["4", "10", "8", "1024"], a: 2 },
-        { q: "(Decisão) Terminou a tarefa antes do prazo. O que fazer?", o: ["Ficar em silêncio", "Avisar supervisor/procurar ajuda", "Mexer no código alheio", "Sair mais cedo"], a: 1 },
-        { q: "(Decisão) Encontrou um bug que não sabe resolver:", o: ["Apagar código", "Pesquisar e depois pedir ajuda", "Interromper supervisor na hora", "Chutar soluções"], a: 1 },
-        { q: "(Decisão) Cliente pediu mudança direta sem o supervisor saber:", o: ["Fazer na hora", "Informar e repassar ao supervisor", "Ignorar", "Dizer que não sabe"], a: 1 },
-        { q: "(Decisão) Não vai conseguir entregar no prazo:", o: ["Esperar vencer", "Avisar o quanto antes", "Trabalhar 24h sem avisar", "Culpar a internet"], a: 1 },
-        { q: "(Decisão) Enviou senha pessoal para o GitHub por engano:", o: ["Deixar lá", "Avisar e trocar senha na hora", "Apagar localmente", "Trocar de nome"], a: 1 }
+        // HTML
+        { q: "(HTML) Qual tag é a mais adequada para definir o título principal de uma página (SEO)?", o: ["<header>", "<title>", "<h1>", "<b>"], a: 2 },
+        { q: "(HTML) Qual atributo é usado para descrever uma imagem para leitores de tela?", o: ["title", "alt", "src", "longdesc"], a: 1 },
+        { q: "(HTML) Qual tag cria uma lista com marcadores (não numerada)?", o: ["<ol>", "<ul>", "<li>", "<list>"], a: 1 },
+        { q: "(HTML) Como abrir um link em uma aba em branco?", o: ["target='_new'", "target='_blank'", "rel='external'", "mode='new'"], a: 1 },
+        { q: "(HTML) Onde ficam os metadados (como o conjunto de caracteres UTF-8)?", o: ["<body>", "<footer>", "<meta-container>", "<head>"], a: 3 },
+        
+        // CSS
+        { q: "(CSS) Qual propriedade cria um espaçamento INTERNO (entre o conteúdo e a borda)?", o: ["margin", "border-spacing", "padding", "gap"], a: 2 },
+        { q: "(CSS) Como selecionar todos os parágrafos dentro de uma div no CSS?", o: ["div > p", "div p", ".div .p", "div+p"], a: 1 },
+        { q: "(CSS) Qual propriedade define a cor do texto?", o: ["font-color", "text-style", "color", "background-text"], a: 2 },
+        { q: "(CSS) Qual valor de 'display' ativa o modelo de layout Flexbox?", o: ["grid", "inline-block", "flex", "block"], a: 2 },
+        { q: "(CSS) A unidade 'rem' é baseada em quê?", o: ["No tamanho do elemento pai", "No tamanho da viewport", "No tamanho da fonte do elemento raiz (html)", "No tamanho da tela"], a: 2 },
+
+        // Lógica (Melhoradas)
+        { q: "(Lógica) Se x = 10. Após a operação x = x + 5, qual o valor final de x?", o: ["5", "10", "15", "20"], a: 2 },
+        { q: "(Lógica) Qual estrutura de controle é usada para repetir um código enquanto uma condição for verdadeira?", o: ["if/else", "while", "switch", "array.push()"], a: 1 },
+        { q: "(Lógica) O que acontece ao tentar acessar o índice [5] de um array que só tem 3 itens?", o: ["Retorna erro ou undefined", "O array cresce sozinho", "Retorna o último item", "O programa reinicia"], a: 0 },
+        { q: "(Lógica) Analise a expressão: (10 é maior que 5) E (5 é menor que 2). O resultado é:", o: ["Verdadeiro", "Falso", "Erro de sintaxe", "Depende da linguagem"], a: 1 },
+        { q: "(Lógica) Qual o resultado da operação '10 % 3' (resto da divisão)?", o: ["3", "3.33", "1", "0"], a: 2 },
+
+        // Matemática
+        { q: "(Matemática) Qual o resultado de 15 + 5 * 2?", o: ["40", "20", "25", "30"], a: 2 },
+        { q: "(Matemática) Na base binária, qual número decimal representa o valor '10'?", o: ["Um", "Dois", "Dez", "Zero"], a: 1 },
+        { q: "(Matemática) Qual o resultado lógico da inversão de (Falso OU Verdadeiro)?", o: ["Verdadeiro", "Falso", "Nulo", "Erro"], a: 1 },
+        { q: "(Matemática) Uma função que cresce exponencialmente:", o: ["Cresce de forma constante", "Cresce cada vez mais rápido", "Diminui com o tempo", "É uma linha reta"], a: 1 },
+        { q: "(Matemática) Um conjunto de 8 bits forma:", o: ["1 Megabyte", "1 Kilobyte", "1 Byte", "1 Nibble"], a: 2 },
+
+        // Decisão
+        { q: "(Decisão) Você terminou a tarefa antes do prazo. Qual a melhor atitude?", o: ["Aguardar o fim do expediente em silêncio", "Informar o gestor e se colocar à disposição", "Ir embora sem avisar", "Alterar o código de outros colegas"], a: 1 },
+        { q: "(Decisão) Encontrou um erro no código que não sabe resolver. O que faz?", o: ["Apaga o erro e finge que não viu", "Chuta soluções", "Pesquisa e, se não resolver, pede ajuda explicando o que tentou", "Para de trabalhar"], a: 2 },
+        { q: "(Decisão) Cliente pede alteração direta para você via chat. Como agir?", o: ["Faz na hora", "Diz que não sabe fazer", "Avisa que recebeu e repassa ao gestor para validar", "Ignora a mensagem"], a: 2 },
+        { q: "(Decisão) Você percebe que vai atrasar uma entrega. O que faz?", o: ["Dá uma desculpa no dia seguinte", "Avisa o gestor antecipadamente e alinha um novo prazo", "Trabalha virado sem avisar ninguém", "Desliga o celular"], a: 1 },
+        { q: "(Decisão) Enviou sem querer uma senha de banco para o GitHub da empresa:", o: ["Deixa lá", "Avisa o responsável técnico imediatamente e troca a senha", "Tenta apagar só no seu PC", "Não faz nada"], a: 1 },
+
+        // Git (Fáceis)
+        { q: "(Git) Qual comando é usado para 'baixar' um repositório da internet para o seu computador pela primeira vez?", o: ["git push", "git commit", "git clone", "git download"], a: 2 },
+        { q: "(Git) Qual comando salva as suas alterações locais com uma mensagem descritiva?", o: ["git save", "git commit -m 'mensagem'", "git send", "git add"], a: 1 },
+        { q: "(Git) Como enviamos os commits locais para o servidor remoto (GitHub)?", o: ["git pull", "git push", "git remote", "git upload"], a: 1 },
+        { q: "(Git) Para que serve uma 'Branch'?", o: ["Para deletar o código antigo", "Para criar uma linha separada de desenvolvimento sem afetar o código principal", "Para conectar o computador à internet", "Para instalar bibliotecas"], a: 1 },
+        { q: "(Git) Qual comando traz as atualizações do servidor para o seu computador local?", o: ["git pull", "git fetch --all", "git update", "git status"], a: 0 }
     ];
 
     let currentQuestion = 0;
@@ -82,14 +103,21 @@
         }
         clearInterval(timer);
         startTimer();
+        
+        document.getElementById('progress-display').innerText = `Pergunta ${currentQuestion + 1} de ${questions.length}`;
+        
         const q = questions[currentQuestion];
-        document.getElementById('question-text').innerText = `${currentQuestion + 1}. ${q.q}`;
+        document.getElementById('question-text').innerText = q.q;
         const optionsDiv = document.getElementById('options-container');
         optionsDiv.innerHTML = '';
+        
         q.o.forEach((opt, index) => {
             const btn = document.createElement('button');
             btn.innerText = opt;
-            btn.onclick = () => { score += (index === q.a ? 1 : 0); nextQuestion(); };
+            btn.onclick = () => { 
+                if (index === q.a) score++;
+                nextQuestion(); 
+            };
             optionsDiv.appendChild(btn);
         });
     }
@@ -103,10 +131,13 @@
         clearInterval(timer);
         document.getElementById('question-content').classList.add('hidden');
         document.getElementById('timer-display').classList.add('hidden');
+        document.getElementById('progress-display').classList.add('hidden');
         document.getElementById('results').classList.remove('hidden');
+        
+        const perc = (score / questions.length) * 100;
         document.getElementById('score-summary').innerHTML = `
-            <p>O candidato acertou <strong>${score}</strong> de <strong>${questions.length}</strong> questões.</p>
-            <p>Aproveitamento: ${(score/questions.length*100).toFixed(1)}%</p>
+            <p>Acertos: <strong>${score} de ${questions.length}</strong></p>
+            <p>Desempenho: <strong>${perc.toFixed(1)}%</strong></p>
         `;
     }
 
